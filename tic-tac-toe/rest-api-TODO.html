@@ -1,0 +1,67 @@
+To start a game:
+
+    gameId is a string of random alphanumeric e.g. x82hj3kls9d
+
+    method:         PUT
+    endpoint:       /games/{gameId}/player1
+    content-type:   text/plain
+    content:        player's name
+
+    returns:
+
+        response code: 202
+        header (location): /games/{gameId}
+
+
+To check if someone has joined as player 2, poll the for the game state:
+
+    method:         GET
+    endpoint:       /games/{gameId}
+
+    returns if the game is waiting for player 2:
+
+        response code:  200
+        content-type:   text/json
+        content:        { player1: "dave", player2: null }
+
+    or if the game has already begun:
+
+        response code:  200
+        content-type:   text/json
+        content:        { player1: "dave", player2: "paul", board: "         ", state: "ready" }
+
+    or if the gameId is wrong:
+
+        response code:  404
+
+    "state" can also be "draw" or "win"
+
+
+To join a game as player 2:
+
+    method:         PUT
+    endpoint:       /games/{gameId}/player2
+    content-type:   text/plain
+    content:        player's name
+
+    returns:
+
+        response code: 202
+        header (location): /games/{gameId}
+
+    or, if there is already a different player 2
+
+        response code:  409
+        content-type:   text/plain
+        content:        Another player has already joined this game.
+
+    or if the gameId doesn't represent a game that exists:
+
+        response code:  404
+
+
+
+... coming next:
+
+PUT to /games/{gameId}/player1/moves/{squareIndex}
+(to play in a particular square)

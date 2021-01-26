@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Tic-Tac-Toe</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="board"></div>
+        <h2 class="win-message"></h2>
+        <button class="restart">RESTART GAME</button>
+    </div>
+    <script>
+        //let board = ["", "", "", "", "", "", "", "", ""];
+        let player = "X";
+
+        const boardContainer = document.querySelector(".board");
+        const winMessage = document.querySelector(".win-message");
+
+        boardContainer.innerHTML = "";
+        for (let i = 0; i < 9; i++) {
+            boardContainer.innerHTML += `<div class="square"></div>`;
+        }
+        const squares = Array.from(boardContainer.querySelectorAll(".square"));
+
+        function handleClick(e) {
+            const clickedSquare = e.target;
+            let squareIndex = -1;
+            let square = clickedSquare;
+
+            while (square) {
+                squareIndex++;
+                square = square.previousSibling;
+            }
+
+
+            if(clickedSquare.textContent != "") return;
+
+            clickedSquare.innerHTML = player;
+
+            handleResult();
+        }
+
+        const winMatrix = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        function isWin(condition) {
+            return condition.every(index => squares[index].textContent == player);
+        }
+
+        function handleResult() {
+
+            const won = winMatrix.some(isWin);
+
+            if (won) {
+                winMessage.innerText = `${player} is the winner`;
+                return;
+            }
+
+            if(squares.every(square => square.textContent !== "")) {
+                winMessage.innerText = "Draw";
+            }
+
+            handlePlayerChange();
+        }
+
+        function handlePlayerChange() {
+            player = player === "X" ? "0" : "X";
+        }
+
+        function handleRestart() {
+            player = "X";
+            squares.forEach(square => square.innerHTML = "");
+            winMessage.innerText = "";
+        }
+
+        boardContainer.addEventListener("click", handleClick);
+        document.querySelector(".restart").addEventListener("click", handleRestart);
+    </script>
+</body>
+</html>
