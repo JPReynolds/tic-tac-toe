@@ -16,7 +16,7 @@ exports.putPlayerOne = (req, res, next) => {
         .then(() => {
             res.sendStatus(202);
         })
-        .catch(err => console.log(err)); 
+        .catch(next); 
 }
 
 exports.putPlayerTwo = (req, res, next) => {
