@@ -12,6 +12,8 @@ exports.getGame = (req, res, next) => {
 exports.putPlayerOne = (req, res, next) => {
     const { name } = req.body;
     const { gameId } = req.params;
+    console.log(`Starting game ${gameId} for player: ${name}.`);
+
     updatePlayerOne(name, gameId)
         .then(() => {
             res.sendStatus(202);

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Tic-Tac-Toe</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <form class="new-game">
+        <input type="text" id="name" placeholder="Enter player 1 name"/>
+        <button class="join-game" id="name">JOIN</button>
+        <input type="text" id="name2" placeholder="Enter player 2 name"/>
+        <button class="join-game" id="name2">JOIN</button>
+        <button class="new-game">START</button>
+    </form>
+    <div class="board"></div>
+</body>
+<script>
+    let gameId;
+
+    const newGameForm = document.querySelector("form.new-game");
+    const newGameButton = document.querySelector("button.new-game");
+    newGameForm.addEventListener("submit", createNewGame);
+
+    const joinButtonOne = document.querySelector("button#name");
+    const joinButtonTwo = document.querySelector("button#name2");
+    joinButtonOne.addEventListener("click", joinPlayerOne);
+    joinButtonTwo.addEventListener("click", joinPlayerTwo);
+
+    function joinPlayerOne(e) {
+        e.preventDefault();
+        // fetch players name
+        const nameInputElement = document.querySelector("input#name");
+        const name = nameInputElement.value;
+        gameId = Date.now().toString();
+
+        // call API
+        fetch(`http://localhost:3000/games/${gameId}/player1`, {
+            method: "PUT",
+            body: JSON.stringify({ name }),
+            headers: { "content-type": "application/json"}
+        }).then(resp => {
+            // console.log(resp);
+            if(resp.ok) {
+                // display confirmation message
+                const gameConfirmationMsg = document.createElement("p");
+                const msg = document.createTextNode("Player 1 has joined");
+                gameConfirmationMsg.appendChild(msg)
+                newGameForm.appendChild(gameConfirmationMsg);
+
+            } else {
+                // extract error message from server and render
+
+            }
+
+        });
+    }
+
+    function joinPlayerTwo(e) {
+        e.preventDefault();
+        // fetch players name
+        const nameInputElement = document.querySelector("input#name2");
+        const name = nameInputElement.value;
+
+        // call API
+        fetch(`http://localhost:3000/games/${gameId}/player2`, {
+            method: "PUT",
+            body: JSON.stringify({ name }),
+            headers: { "content-type": "application/json"}
+        }).then(resp => {
+            console.log(resp);
+            if (resp.ok) {
+                const gameConfirmationMsg = document.createElement("p");
+                const msg = document.createTextNode("Player 2 has joined");
+                gameConfirmationMsg.appendChild(msg)
+                newGameForm.appendChild(gameConfirmationMsg);
+
+            } else {
+                // extract error message from server and render
+            }
+
+        });
+    }
+
+    function createNewGame(e) {
+        e.preventDefault();
+        // create board
+        const boardContainer = document.querySelector(".board");
+        boardContainer.innerHTML = "";
+        for (let i = 0; i < 9; i++) {
+            boardContainer.innerHTML += `<div class="square"></div>`;
+        }
+
+
+    }
+</script>
+</html>
