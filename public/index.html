@@ -20,6 +20,8 @@
     <button class="restart">RESTART GAME</button>
 </body>
 <script>
+
+    const API_URL = "https://mysterious-dawn-64613.herokuapp.com"
     let gameId;
 
     const newGameForm = document.querySelector("form.new-game");
@@ -39,7 +41,7 @@
         gameId = Date.now().toString();
 
         // call API
-        fetch(`http://localhost:3000/games/${gameId}/player1`, {
+        fetch(`${API_URL}/games/${gameId}/player1`, {
             method: "PUT",
             body: JSON.stringify({ name }),
             headers: { "content-type": "application/json"}
@@ -70,7 +72,7 @@
         const name = nameInputElement.value;
 
         // call API
-        fetch(`http://localhost:3000/games/${gameId}/player2`, {
+        fetch(`${API_URL}/games/${gameId}/player2`, {
             method: "PUT",
             body: JSON.stringify({ name }),
             headers: { "content-type": "application/json"}
