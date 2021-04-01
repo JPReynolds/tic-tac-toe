@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { putPlayerOne, getGame, putPlayerTwo } = require("../controllers/controller");
+const { putPlayerOne, getGame, putPlayerTwo, putPlayerMove } = require("../controllers/controller");
 
 router
     .route("/:gameId")
@@ -12,5 +12,9 @@ router
 router
     .route("/:gameId/player2")
     .put(putPlayerTwo)
+
+router
+    .route("/:gameId/:player/move/:squareIndex")
+    .put(putPlayerMove)
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const { updatePlayerOne, selectGame, updatePlayerTwo } = require("../models/model");
+const { updatePlayerOne, selectGame, updatePlayerTwo, updatePlayerMove } = require("../models/model");
 
 exports.getGame = (req, res, next) => {
     const { gameId } = req.params;
@@ -29,4 +29,14 @@ exports.putPlayerTwo = (req, res, next) => {
             res.sendStatus(202);
         })
         .catch(next); 
+}
+
+exports.putPlayerMove = (req, res, next) => {
+    const { playerMove } = req.body;
+    const { gameId, player, squareIndex } = req.params;
+    updatePlayerMove(playerMove, gameId, player, squareIndex)
+        .then(() => {
+            res.sendStatus(202)
+        })
+        .catch(next);
 }
