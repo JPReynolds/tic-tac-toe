@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Tic-Tac-Toe</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <form class="new-game">
+        <input type="text" id="name" placeholder="Enter player 1 name"/>
+        <button class="join-game" id="name">JOIN</button>
+        <input type="text" id="name2" placeholder="Enter player 2 name"/>
+        <button class="join-game" id="name2">JOIN</button>
+        <button class="new-game">START</button>
+    </form>
+    <div class="board"></div>
+    <h2 class="win-message"></h2>
+    <button class="restart">RESTART GAME</button>
+</body>
+<script>
+
+    const API_URL = "https://mysterious-dawn-64613.herokuapp.com";
+    let gameId = new URL(location.href).searchParams.get("gameId");
+
+    const newGameForm = document.querySelector("form.new-game");
+    const newGameButton = document.querySelector("button.new-game");
+    newGameForm.addEventListener("submit", createNewGame);
+
+    const joinButtonOne = document.querySelector("button#name");
+    const joinButtonTwo = document.querySelector("button#name2");
+    joinButtonOne.addEventListener("click", joinPlayerOne);
+    joinButtonTwo.addEventListener("click", joinPlayerTwo);
+
+    function joinPlayerOne(e) {
+        e.preventDefault();
+        // fetch players name
+        const nameInputElement = document.querySelector("input#name");
+        const name = nameInputElement.value;
+        gameId = gameId || Date.now().toString();
+
+        // call API
+        fetch(`${API_URL}/games/${gameId}/player1`, {
+            method: "PUT",
+            body: JSON.stringify({ name }),
+            headers: { "content-type": "application/json"}
+        }).then(resp => {
+            // console.log(resp);
+            if(resp.ok) {
+                // display confirmation message
+                const gameConfirmationMsg = document.createElement("p");
+                const msg = document.createTextNode("Player 1 has joined");
+                gameConfirmationMsg.appendChild(msg)
+                newGameForm.appendChild(gameConfirmationMsg);
+
+                nameInputElement.remove();
+                joinButtonOne.remove();
+
+            } else {
+                // extract error message from server and render
+
+            }
+
+        });
+    }
+
+    function joinPlayerTwo(e) {
+        e.preventDefault();
+        // fetch players name
+        const nameInputElement = document.querySelector("input#name2");
+        const name = nameInputElement.value;
+
+        // call API
+        fetch(`${API_URL}/games/${gameId}/player2`, {
+            method: "PUT",
+            body: JSON.stringify({ name }),
+            headers: { "content-type": "application/json"}
+        }).then(resp => {
+            console.log(resp);
+            if (resp.ok) {
+                const gameConfirmationMsg = document.createElement("p");
+                const msg = document.createTextNode("Player 2 has joined");
+                gameConfirmationMsg.appendChild(msg)
+                newGameForm.appendChild(gameConfirmationMsg);
+
+                nameInputElement.remove();
+                joinButtonTwo.remove();
+            } else {
+                // extract error message from server and render
+            }
+
+        });
+    }
+
+    function createNewGame(e) {
+        e.preventDefault();
+
+        newGameButton.remove();
+
+        // create board
+        const boardContainer = document.querySelector(".board");
+        const winMessage = document.querySelector(".win-message");
+
+        boardContainer.innerHTML = "";
+        for (let i = 0; i < 9; i++) {
+            boardContainer.innerHTML += `<div class="square"></div>`;
+        }
+
+        let player = "X";
+
+        const squares = Array.from(boardContainer.querySelectorAll(".square"));
+
+        function handleClick(e) {
+            const clickedSquare = e.target;
+            let squareIndex = -1;
+            let square = clickedSquare;
+
+            while (square) {
+                squareIndex++;
+                square = square.previousSibling;
+            }
+
+
+            if(clickedSquare.textContent != "") return;
+
+            clickedSquare.innerHTML = player;
+
+            handleResult();
+        }
+
+        const winMatrix = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        function isWin(condition) {
+            return condition.every(index => squares[index].textContent == player);
+        }
+
+        function handleResult() {
+
+            const won = winMatrix.some(isWin);
+
+            if (won) {
+                winMessage.innerText = `${player} is the winner`;
+                return;
+            }
+
+            if(squares.every(square => square.textContent !== "")) {
+                winMessage.innerText = "Draw";
+            }
+
+            handlePlayerChange();
+        }
+
+        function handlePlayerChange() {
+            player = player === "X" ? "0" : "X";
+        }
+
+        function handleRestart() {
+            player = "X";
+            squares.forEach(square => square.innerHTML = "");
+            winMessage.innerText = "";
+        }
+
+        boardContainer.addEventListener("click", handleClick);
+        document.querySelector(".restart").addEventListener("click", handleRestart);
+
+    }
+</script>
+</html>

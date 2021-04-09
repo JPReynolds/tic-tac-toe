@@ -35,10 +35,11 @@ exports.selectGame = (gameId) => {
     })
 }
 
-exports.updatePlayerMove = (playerMove, gameId, player, squareIndex) => {
+exports.updatePlayerMove = (gameId, player, squareIndex) => {
     return fs.readFile(fileName, "utf8").then((games) => {
         const parsedGames = JSON.parse(games);
         const gameIndex = parsedGames.findIndex(g => g.gameId === gameId);
+        const playerMove = player === "player1" ? "X" : "0";
         parsedGames[gameIndex].board[squareIndex] = playerMove;
         return fs.writeFile(fileName, JSON.stringify(parsedGames), "utf8")
     })

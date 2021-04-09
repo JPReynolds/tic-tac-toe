@@ -32,9 +32,8 @@ exports.putPlayerTwo = (req, res, next) => {
 }
 
 exports.putPlayerMove = (req, res, next) => {
-    const { playerMove } = req.body;
     const { gameId, player, squareIndex } = req.params;
-    updatePlayerMove(playerMove, gameId, player, squareIndex)
+    updatePlayerMove(gameId, player, squareIndex)
         .then(() => {
             res.sendStatus(202)
         })
