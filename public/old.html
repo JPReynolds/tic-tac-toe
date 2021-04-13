@@ -107,8 +107,6 @@
             boardContainer.innerHTML += `<div class="square"></div>`;
         }
 
-        let player = "X";
-
         const squares = Array.from(boardContainer.querySelectorAll(".square"));
 
         function handleClick(e) {
@@ -120,7 +118,6 @@
                 squareIndex++;
                 square = square.previousSibling;
             }
-
 
             if(clickedSquare.textContent != "") return;
 

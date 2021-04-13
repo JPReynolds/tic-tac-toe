@@ -8,31 +8,63 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <form class="game-form">
+    <form class="newGame-form">
         <input type="text" id="name" placeholder="Enter name"/>
-        <button class="new-game">NEW GAME</button>
-        <input type="text" id ="url" placeholder="Enter URL to join"/>
-        <button class="join-game">JOIN GAME</button>
+        <button class="new-game">START GAME</button>
     </form>
+    <div class="board"></div>
 </body>
 <script>
-    const API_URL = "https://mysterious-dawn-64613.herokuapp.com";
-    let gameId = new URL(location.href).searchParams.get("gameId");
+    // const API_URL = "https://mysterious-dawn-64613.herokuapp.com";
+    const API_URL = "http://localhost:3000";
+    let gameId;
+    let player;
 
-    const gameForm = document.querySelector("form.game-form")
-
+    const newGameForm = document.querySelector("form.newGame-form")
     const newGameButton = document.querySelector("button.new-game");
-    const joinGameButton = document.querySelector("button.join-game");
+    newGameButton.addEventListener("click", startGame);
 
-    newGameButton.addEventListener("click", newGame);
-    // joinGameButton.addEventListener("click", joinGame);
+    function refresh() {
+        fetch(`${API_URL}/games/${gameId}`, {
+            method: "GET",
+            headers: { "content-type": "application/json"}
+        })
+        .then(res => {
+           return res.text().then((game) => {
+               const parsedGame = JSON.parse(game);
+               if (parsedGame.board) {
+                   const board = parsedGame.board;
+                   for (let i = 0; i < board.length; i++) {
+                       const squareToChange = document.querySelector(`#square-${i}`);
+                       squareToChange.innerHTML = board[i];
+                   }
+               }
+           })
+        })
+        .then()
 
-    function newGame(e) {
+        setTimeout(refresh, 2000);
+    }
+
+    // setTimeout(refresh, 2000);
+
+    function startGame(e) {
         e.preventDefault();
-        // fetch players name
+        gameId = new URL(location.href).searchParams.get("gameId");
+
+        if (gameId) {
+            joinGame();
+        } else {
+            newGame();
+        }
+    }
+
+    function newGame() {
         const nameInputElement = document.querySelector("input#name");
         const name = nameInputElement.value;
-        gameId = gameId || Date.now().toString();
+        player = "player1";
+
+        gameId = Date.now().toString();
 
         fetch(`${API_URL}/games/${gameId}/player1`, {
             method: "PUT",
@@ -41,11 +73,59 @@
         }).then(res => {
             if (res.ok) {
                 const gameUrlMsg = document.createElement("p");
-                const msg = document.createTextNode(`${API_URL}/games/${gameId}`);
+                const msg = document.createTextNode(`${API_URL}/?gameId=${gameId}`);
                 gameUrlMsg.appendChild(msg);
-                gameForm.appendChild(gameUrlMsg);
+                newGameForm.appendChild(gameUrlMsg);
+                createBoard();
             }
         })
     }
+
+    function joinGame() {
+        const nameInputElement = document.querySelector("input#name");
+        const name = nameInputElement.value;
+        player = "player2";
+
+        fetch(`${API_URL}/games/${gameId}/player2`, {
+            method: "PUT",
+            body: JSON.stringify({ name }),
+            headers: { "content-type": "application/json"}
+        }).then(res => {
+            if (res.ok) {
+                createBoard();
+            }
+        })
+    }
+
+    
+    function playerMove(e) {
+        const clickedSquare = e.target;
+        let squareIndex = -1;
+        let square = clickedSquare;
+
+        while (square) {
+            squareIndex++;
+            square = square.previousSibling;
+        }
+
+        fetch(`${API_URL}/games/${gameId}/${player}/move/${squareIndex}`, {
+            method: "PUT",
+            headers: { "content-type": "application/json"}
+        }).then(res => {
+            console.log(res)
+        })
+    }
+
+    function createBoard() {
+        const boardContainer = document.querySelector(".board");
+
+        boardContainer.innerHTML = "";
+        for (let i = 0; i < 9; i++) {
+            boardContainer.innerHTML += `<div class="square" id="square-${i}"></div>`;
+        }
+
+        boardContainer.addEventListener("click", playerMove);
+    }
+
 </script>
 </html>
